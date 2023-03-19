@@ -4,6 +4,7 @@ import sys
 import time
 from argparse import Namespace
 from pathlib import Path
+from typing import Optional
 
 import akshare as ak
 import pandas as pd
@@ -22,8 +23,7 @@ trade_df = pd.read_csv("./stock/tool_trade_date_hist_sina_df.csv")
 
 # 今天的原始数据
 @func_utils(
-    csv_path="./raw_data/", csv_name="raw_data", table_name="everyday_data", df=trade_df
-)
+    csv_path="./data/raw_data", csv_name="raw_data")
 def get_raw_date(date, *args, **kwargs):
     stock_zh_a_spot_df = ak.stock_zh_a_spot()
     print(stock_zh_a_spot_df[:5])
@@ -38,42 +38,71 @@ def zt_analyse_df(date, *args, **kwargs):
 
 
 # zt 数据
-@func_utils(csv_path="./raw_data/", csv_name="zt", table_name="zt", df=trade_df)
+@func_utils(csv_path="./data/zt", csv_name="zt")
 def get_zt_data(date, *args, **kwargs):
     date = date.replace("-", "")
-    stock_em_zt_pool_df = ak.stock_em_zt_pool(date)
+    stock_em_zt_pool_df = ak.stock_zt_pool_em(date)
     return stock_em_zt_pool_df
 
 
 # zb数据
-@func_utils(csv_path="./raw_data/", csv_name="zb", table_name="zb", df=trade_df)
+@func_utils(csv_path="./data/zb", csv_name="zb")
 def get_zb_data(date, *args, **kwargs):
     date = date.replace("-", "")
-    stock_em_zt_pool_zbgc_df = ak.stock_em_zt_pool_zbgc(date)
+    stock_em_zt_pool_zbgc_df = ak.stock_zt_pool_zbgc_em(date)
     return stock_em_zt_pool_zbgc_df
 
 
 # dt数据
-@func_utils(csv_path="./raw_data", csv_name="dt", table_name="dt", df=trade_df)
+@func_utils(csv_path="./data/dt", csv_name="dt")
 def get_dt_data(date, *args, **kwargs):
     date = date.replace("-", "")
-    stock_em_zt_pool_dtgc_df = ak.stock_em_zt_pool_dtgc(date)
+    stock_em_zt_pool_dtgc_df = ak.stock_zt_pool_dtgc_em(date)
     return stock_em_zt_pool_dtgc_df
+
+
+# 新股
+@func_utils(csv_path="./data/new", csv_name="new", )
+def get_new(*args, **kwargs):
+    date = kwargs["date"]
+    stock_zh_a_new_em = ak.stock_zh_a_new_em()
+    return stock_zh_a_new_em
+
+
+@func_utils(csv_path="./sentiment/strong", csv_name="strong")
+def get_strong(*args, **kwargs):
+    date = kwargs["date"]
+    stock_zt_pool_strong_em = ak.stock_zt_pool_strong_em(date)
+    return stock_zt_pool_strong_em
+
+
+def read_data(path: Optional[str, Path]):
+    if isinstance(path, str):
+        path = Path(path)
+    if path.exists():
+        data = pd.read_csv(path)
+    else:
+        data = pd.DataFrame()
+    return data
 
 
 @logger.catch
 def merge_data(date, *args, **kwargs):
-    df = pd.read_excel("sentiment/stock2023.xlsx")
-    raw_data = pd.read_csv(f"raw_data/raw_data_{date}.csv")
-    zt_data = pd.read_csv(f"raw_data/zt_{date}.csv")
-    dt_data_path = Path(f"raw_data/dt_{date}.csv")
+    df = pd.read_csv("sentiment/stock2023.csv")
+    raw_data = pd.read_csv(f"data/raw_data/raw_data_{date}.csv")
+    zt_data = pd.read_csv(f"data/zt/zt_{date}.csv")
+    dt_data_path = Path(f"data/dt/dt_{date}.csv")
     if dt_data_path.exists():
-        dt_data = pd.read_csv(f"raw_data/dt_{date}.csv")
+        dt_data = pd.read_csv(f"data/dt/dt_{date}.csv")
     else:
         dt_data = pd.DataFrame()
-    zb_data = pd.read_csv(f"raw_data/zb_{date}.csv")
+    zb_data = pd.read_csv(f"data/zb/zb_{date}.csv")
     increase = raw_data[raw_data["涨跌幅"] > 0]
     decrease = raw_data[raw_data["涨跌幅"] < 0]
+
+    new_df = read_data(f"./data/new/new_{date}.csv")
+    zt_data = zt_data[~zb_data["代码"].isin(new_df["代码"].tolist())]
+
     zt_num = zt_data.shape[0]
 
     above_three = zt_data[zt_data["连板数"] > 3].sort_values("连板数", ascending=False)
@@ -106,11 +135,19 @@ def merge_data(date, *args, **kwargs):
     df.to_csv("sentiment/stock2023.csv", index=False)
 
 
-def main(date, *args, **kwargs):
-    if date in trade_df["trade_date"].tolist():
+def main(*args, **kwargs):
+    if kwargs['date'] in trade_df["trade_date"].tolist():
         # alerts_cls()
+        date = kwargs["date"]
+
         get_raw_date(date)
         time.sleep(5)
+
+        get_new(date)
+        time.sleep(10)
+
+        get_strong(date)
+        time.sleep(10)
 
         get_zt_data(date)
         time.sleep(20)

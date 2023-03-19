@@ -1,11 +1,10 @@
 import functools
-from datetime import datetime
 import pandas as pd
 from loguru import logger
 
 
 @logger.catch
-def func_utils(csv_path, csv_name):
+def func_utils(csv_path, csv_name, *args, **kwargs):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
