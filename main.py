@@ -24,7 +24,8 @@ trade_df = pd.read_csv("./stock/tool_trade_date_hist_sina_df.csv")
 # 今天的原始数据
 @func_utils(
     csv_path="./data/raw_data", csv_name="raw_data")
-def get_raw_date(date, *args, **kwargs):
+def get_raw_date(*args, **kwargs):
+    date = kwargs["date"]
     stock_zh_a_spot_df = ak.stock_zh_a_spot()
     print(stock_zh_a_spot_df[:5])
     return stock_zh_a_spot_df
@@ -32,14 +33,16 @@ def get_raw_date(date, *args, **kwargs):
 
 # 今天的cls zt分析数据
 @logger.catch
-def zt_analyse_df(date, *args, **kwargs):
+def zt_analyse_df(*args, **kwargs):
+    date = kwargs["date"]
     date = date.replace("-", "")
     return stock_zh_a_zt_analyse_cls(date)
 
 
 # zt 数据
 @func_utils(csv_path="./data/zt", csv_name="zt")
-def get_zt_data(date, *args, **kwargs):
+def get_zt_data(*args, **kwargs):
+    date = kwargs["date"]
     date = date.replace("-", "")
     stock_em_zt_pool_df = ak.stock_zt_pool_em(date)
     return stock_em_zt_pool_df
@@ -47,7 +50,8 @@ def get_zt_data(date, *args, **kwargs):
 
 # zb数据
 @func_utils(csv_path="./data/zb", csv_name="zb")
-def get_zb_data(date, *args, **kwargs):
+def get_zb_data(*args, **kwargs):
+    date = kwargs["date"]
     date = date.replace("-", "")
     stock_em_zt_pool_zbgc_df = ak.stock_zt_pool_zbgc_em(date)
     return stock_em_zt_pool_zbgc_df
@@ -55,7 +59,8 @@ def get_zb_data(date, *args, **kwargs):
 
 # dt数据
 @func_utils(csv_path="./data/dt", csv_name="dt")
-def get_dt_data(date, *args, **kwargs):
+def get_dt_data(*args, **kwargs):
+    date = kwargs["date"]
     date = date.replace("-", "")
     stock_em_zt_pool_dtgc_df = ak.stock_zt_pool_dtgc_em(date)
     return stock_em_zt_pool_dtgc_df
@@ -63,20 +68,20 @@ def get_dt_data(date, *args, **kwargs):
 
 # 新股
 @func_utils(csv_path="./data/new", csv_name="new", )
-def get_new(*args, **kwargs):
+def get_new(*args, **kwargs) -> pd.DataFrame:
     date = kwargs["date"]
     stock_zh_a_new_em = ak.stock_zh_a_new_em()
     return stock_zh_a_new_em
 
 
 @func_utils(csv_path="./sentiment/strong", csv_name="strong")
-def get_strong(*args, **kwargs):
+def get_strong(*args, **kwargs) -> pd.DataFrame:
     date = kwargs["date"]
     stock_zt_pool_strong_em = ak.stock_zt_pool_strong_em(date)
     return stock_zt_pool_strong_em
 
 
-def read_data(path: Optional[str, Path]):
+def read_data(path: Optional[str, Path]) -> pd.DataFrame:
     if isinstance(path, str):
         path = Path(path)
     if path.exists():
@@ -87,7 +92,8 @@ def read_data(path: Optional[str, Path]):
 
 
 @logger.catch
-def merge_data(date, *args, **kwargs):
+def merge_data(*args, **kwargs):
+    date = kwargs["date"]
     df = pd.read_csv("sentiment/stock2023.csv")
     raw_data = pd.read_csv(f"data/raw_data/raw_data_{date}.csv")
     zt_data = pd.read_csv(f"data/zt/zt_{date}.csv")
