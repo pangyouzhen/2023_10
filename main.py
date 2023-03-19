@@ -4,7 +4,6 @@ import sys
 import time
 from argparse import Namespace
 from pathlib import Path
-from typing import Optional
 
 import akshare as ak
 import pandas as pd
@@ -81,7 +80,7 @@ def get_strong(*args, **kwargs) -> pd.DataFrame:
     return stock_zt_pool_strong_em
 
 
-def read_data(path: Optional[str, Path]) -> pd.DataFrame:
+def read_data(path: str | Path) -> pd.DataFrame:
     if isinstance(path, str):
         path = Path(path)
     if path.exists():
