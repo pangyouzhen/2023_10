@@ -76,6 +76,7 @@ def get_new(*args, **kwargs) -> pd.DataFrame:
 @func_utils(csv_path="./sentiment/strong", csv_name="strong")
 def get_strong(*args, **kwargs) -> pd.DataFrame:
     date = kwargs["date"]
+    date = date.replace("-", "")
     stock_zt_pool_strong_em = ak.stock_zt_pool_strong_em(date)
     return stock_zt_pool_strong_em
 
