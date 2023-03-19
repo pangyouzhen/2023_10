@@ -36,7 +36,7 @@ def get_raw_date(*args, **kwargs):
 def zt_analyse_df(*args, **kwargs):
     date = kwargs["date"]
     date = date.replace("-", "")
-    return stock_zh_a_zt_analyse_cls(date)
+    return stock_zh_a_zt_analyse_cls(date, img_path="./data/cls_zt")
 
 
 # zt 数据
