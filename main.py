@@ -107,7 +107,7 @@ def merge_data(*args, **kwargs):
     decrease = raw_data[raw_data["涨跌幅"] < 0]
 
     new_df = read_data(f"./data/new/new_{date}.csv")
-    zt_data = zt_data[~zb_data["代码"].isin(new_df["代码"].tolist())]
+    zt_data = zt_data[~zt_data["代码"].isin(new_df["代码"].tolist())]
 
     zt_num = zt_data.shape[0]
 
