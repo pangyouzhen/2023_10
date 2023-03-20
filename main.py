@@ -144,29 +144,29 @@ def merge_data(*args, **kwargs):
 def main(*args, **kwargs):
     if kwargs['date'] in trade_df["trade_date"].tolist():
         # alerts_cls()
-        date = kwargs["date"]
+        # date = kwargs["date"]
 
-        get_raw_date(date)
+        get_raw_date(date = kwargs["date"])
         time.sleep(5)
 
-        get_new(date)
+        get_new(date = kwargs["date"])
         time.sleep(10)
 
-        get_strong(date)
+        get_strong(date = kwargs["date"])
         time.sleep(10)
 
-        get_zt_data(date)
+        get_zt_data(date = kwargs["date"])
         time.sleep(20)
 
-        get_dt_data(date)
+        get_dt_data(date = kwargs["date"])
         time.sleep(20)
 
-        get_zb_data(date)
+        get_zb_data(date = kwargs["date"])
         time.sleep(20)
 
-        zt_analyse_df(date)
+        zt_analyse_df(date = kwargs["date"])
 
-        merge_data(date)
+        merge_data(date = kwargs["date"])
     else:
         logger.info("今天不是交易日")
 
