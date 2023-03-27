@@ -78,6 +78,7 @@ def get_strong(*args, **kwargs) -> pd.DataFrame:
     date = kwargs["date"]
     date = date.replace("-", "")
     stock_zt_pool_strong_em = ak.stock_zt_pool_strong_em(date)
+    stock_zt_pool_strong_em = stock_zt_pool_strong_em.sort_values("所属行业")
     return stock_zt_pool_strong_em
 
 
