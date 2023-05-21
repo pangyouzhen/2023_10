@@ -99,6 +99,7 @@ def merge_data(*args, **kwargs):
     raw_data = pd.read_csv(f"data/raw_data/raw_data_{date}.csv")
     zt_data = pd.read_csv(f"data/zt/zt_{date}.csv")
     dt_data_path = Path(f"data/dt/dt_{date}.csv")
+    new_data_path = Path(f"data/new/new_{date}.csv")
     if dt_data_path.exists():
         dt_data = pd.read_csv(f"data/dt/dt_{date}.csv")
     else:
@@ -107,7 +108,11 @@ def merge_data(*args, **kwargs):
     increase = raw_data[raw_data["涨跌幅"] > 0]
     decrease = raw_data[raw_data["涨跌幅"] < 0]
 
-    new_df = read_data(f"./data/new/new_{date}.csv")
+    if new_data_path.exists():
+        new_df = pd.read_csv(f"./data/new/new_{date}.csv")
+    else:
+        new_df = pd.DataFrame()
+    
     zt_data = zt_data[~zt_data["代码"].isin(new_df["代码"].tolist())]
 
     zt_num = zt_data.shape[0]
