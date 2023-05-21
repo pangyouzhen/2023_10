@@ -112,6 +112,7 @@ def merge_data(*args, **kwargs):
         new_df = pd.read_csv(f"./data/new/new_{date}.csv")
     else:
         new_df = pd.DataFrame()
+        new_df["代码"]=None
     
     zt_data = zt_data[~zt_data["代码"].isin(new_df["代码"].tolist())]
 
