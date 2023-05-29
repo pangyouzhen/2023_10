@@ -44,6 +44,7 @@ def get_zt_data(*args, **kwargs):
     date = kwargs["date"]
     date = date.replace("-", "")
     stock_em_zt_pool_df = ak.stock_zt_pool_em(date)
+    stock_em_zt_pool_df = stock_em_zt_pool_df.sort_values("所属行业")
     return stock_em_zt_pool_df
 
 
