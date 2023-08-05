@@ -11,6 +11,7 @@ from loguru import logger
 
 from stock.cls.stock_cls_alerts import stock_zh_a_alerts_cls
 from stock.cls.stock_cls_zt_analyse import stock_zh_a_zt_analyse_cls
+from stock.em.stock_zh_a_new_em import stock_zh_a_new_em
 from stock.utils.wraps_utils import func_utils
 
 print('start------')
@@ -67,11 +68,16 @@ def get_dt_data(*args, **kwargs):
 
 
 # 新股
+# 新股改成1个月之内上市的
 @func_utils(csv_path="./data/new", csv_name="new", )
 def get_new(*args, **kwargs) -> pd.DataFrame:
     date = kwargs["date"]
-    stock_zh_a_new_em = ak.stock_zh_a_new_em()
-    return stock_zh_a_new_em
+    stock_zh_a_new_em_df = stock_zh_a_new_em()
+    stock_zh_a_new_em_df["date"] = pd.to_datetime(date)
+    stock_zh_a_new_em_df["date_diff"] = (stock_zh_a_new_em_df["date"] - stock_zh_a_new_em_df["上市日期"]).dt.days
+    stock_zh_a_new_em_df = stock_zh_a_new_em_df[stock_zh_a_new_em_df["date_diff"]<31]
+    stock_zh_a_new_em_df.drop(columns=["上市日期","date","date_diff"],axis=1,inplace=True)
+    return stock_zh_a_new_em_df
 
 
 @func_utils(csv_path="./sentiment/strong", csv_name="strong")
@@ -188,12 +194,14 @@ FUNCTION_MAP = {
     "all": main,
     "sentiment": merge_data,
     # "cls": alerts_cls,
+    "new":get_new,
 }
 
 
 def parse_para():
     parser = argparse.ArgumentParser(description="获取市场情绪")
     parser.add_argument("--func", choices=FUNCTION_MAP.keys(), help="获取涨停数据")
+    # 输入日期格式 2023-08-04
     parser.add_argument("--date", default=str(datetime.datetime.today().date()))
     args = parser.parse_args()
     print(args)
