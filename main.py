@@ -13,6 +13,7 @@ from stock.cls.stock_cls_alerts import stock_zh_a_alerts_cls
 from stock.cls.stock_cls_zt_analyse import stock_zh_a_zt_analyse_cls
 from stock.em.stock_zh_a_new_em import stock_zh_a_new_em
 from stock.utils.wraps_utils import func_utils
+from retry import retry
 
 print('start------')
 path = Path("./log")
@@ -32,7 +33,7 @@ def get_raw_date(*args, **kwargs):
 
 
 # 今天的cls zt分析数据
-@logger.catch
+@retry(ConnectionResetError, tries=3, delay=2)
 def zt_analyse_df(*args, **kwargs):
     date = kwargs["date"]
     date = date.replace("-", "")
@@ -99,7 +100,6 @@ def read_data(path: str | Path) -> pd.DataFrame:
     return data
 
 
-@logger.catch
 def merge_data(*args, **kwargs):
     date = kwargs["date"]
     df = pd.read_csv("sentiment/stock2023.csv")
@@ -149,6 +149,8 @@ def merge_data(*args, **kwargs):
             "首板": one.shape[0],
         }]
     )
+    # 防止最新的重复
+    df = df.loc[df["date"] != date,:]
     df = df.append(today_df)
     df["日期"] = pd.to_datetime(df["日期"])
     df = df.sort_values("日期")

@@ -4,7 +4,6 @@ from retry import retry
 
 
 @retry(ConnectionResetError, tries=3, delay=2)
-@logger.catch
 def func_utils(csv_path, csv_name, *args, **kwargs):
     def decorator(func):
         @functools.wraps(func)
