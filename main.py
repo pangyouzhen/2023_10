@@ -150,7 +150,7 @@ def merge_data(*args, **kwargs):
         }]
     )
     # 防止最新的重复
-    df = df.loc[df["date"] != date,:]
+    df = df.loc[df["日期"] != date,:]
     df = df.append(today_df)
     df["日期"] = pd.to_datetime(df["日期"])
     df = df.sort_values("日期")
