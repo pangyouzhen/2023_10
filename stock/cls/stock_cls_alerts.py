@@ -35,11 +35,24 @@ def stock_zh_a_roll_cls() -> pd.DataFrame:
     :rtype: pandas.DataFrame
     只抓取当天200条内的
     """
-    url = "https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&refresh_type=1&rn=200&sv=7.7.5"
+
+    url = "https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&refresh_type=1&rn=100&sv=7.7.5"
 
     payload={}
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Content-Type': 'application/json;charset=utf-8',
+    'Connection': 'keep-alive',
+    'Referer': 'https://www.cls.cn/telegraph',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    }
 
-    response = requests.request("GET", url, headers=cls_headers, data=payload)
+    response = requests.request("GET", url, headers=headers, data=payload)
 
     today = datetime.today()
     today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
