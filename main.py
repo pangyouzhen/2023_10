@@ -9,7 +9,7 @@ import akshare as ak
 import pandas as pd
 from loguru import logger
 
-from stock.cls.stock_cls_alerts import stock_zh_a_alerts_cls
+from stock.cls.stock_cls_alerts import stock_zh_a_roll_cls
 from stock.cls.stock_cls_zt_analyse import stock_zh_a_zt_analyse_cls
 from stock.em.stock_zh_a_new_em import stock_zh_a_new_em
 from stock.utils.wraps_utils import func_utils
@@ -25,15 +25,23 @@ trade_df = pd.read_csv("./stock/tool_trade_date_hist_sina_df.csv")
 # 今天的原始数据
 @func_utils(
     csv_path="./data/raw_data", csv_name="raw_data")
-def get_raw_date(*args, **kwargs):
+def get_raw_data(*args, **kwargs):
     date = kwargs["date"]
     stock_zh_a_spot_df = ak.stock_zh_a_spot()
     print(stock_zh_a_spot_df[:5])
     return stock_zh_a_spot_df
 
 
+@func_utils(
+    csv_path="./data/cls_roll", csv_name="cls_roll")
+def get_stock_zh_a_roll_cls(*args, **kwargs):
+    stock_zh_a_roll_cls_df = stock_zh_a_roll_cls()
+    print(stock_zh_a_roll_cls_df[:5])
+    return stock_zh_a_roll_cls_df
+
+
 # 今天的cls zt分析数据
-@retry(ConnectionResetError, tries=3, delay=2)
+@retry(Exception, tries=3, delay=2)
 def zt_analyse_df(*args, **kwargs):
     date = kwargs["date"]
     date = date.replace("-", "")
@@ -162,7 +170,7 @@ def main(*args, **kwargs):
         # alerts_cls()
         # date = kwargs["date"]
 
-        get_raw_date(date = kwargs["date"])
+        get_raw_data(date = kwargs["date"])
         time.sleep(5)
 
         get_new(date = kwargs["date"])
@@ -181,6 +189,10 @@ def main(*args, **kwargs):
         time.sleep(20)
 
         zt_analyse_df(date = kwargs["date"])
+        time.sleep(5)
+        
+        get_stock_zh_a_roll_cls(date=kwargs["date"])
+        time.sleep(5)
 
         merge_data(date = kwargs["date"])
     else:
@@ -192,7 +204,7 @@ FUNCTION_MAP = {
     "dt": get_dt_data,
     "zt_analyse": zt_analyse_df,
     "zb": get_zb_data,
-    "raw": get_raw_date,
+    "raw": get_raw_data,
     "all": main,
     "sentiment": merge_data,
     # "cls": alerts_cls,

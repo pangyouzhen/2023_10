@@ -96,6 +96,7 @@ def stock_zh_a_new_em() -> pd.DataFrame:
     temp_df["上市日期"] = pd.to_datetime(temp_df["上市日期"],format="%Y%m%d")
     return temp_df
 
-# if __name__ == "__main__":
-#     res = stock_zh_a_new_em()
+if __name__ == "__main__":
+    res = stock_zh_a_new_em()
+    print(res)
 #     res.to_csv("stock_zh_a_new_em.csv")

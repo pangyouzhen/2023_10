@@ -27,40 +27,31 @@ cls_headers = {
     "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
-
-def stock_zh_a_alerts_cls() -> pd.DataFrame:
+def stock_zh_a_roll_cls() -> pd.DataFrame:
     """
-    财联社今日快讯
-    https://www.cls.cn/searchPage?keyword=%E5%BF%AB%E8%AE%AF&type=all
-    :return: 今日快讯,id,时间
+    财联社电报加红
+    https://www.cls.cn/telegraph/
+    :return: 时间,标题,简讯
     :rtype: pandas.DataFrame
+    只抓取当天200条内的
     """
+    url = "https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&refresh_type=1&rn=200&sv=7.7.5"
 
-    payload = json.dumps(
-        {
-            "type": "telegram",
-            "keyword": "快讯",
-            "page": 0,
-            "rn": 30,
-            "os": "web",
-            "sv": "7.2.2",
-            "app": "CailianpressWeb",
-        }
-    )
+    payload={}
+
+    response = requests.request("GET", url, headers=cls_headers, data=payload)
+
     today = datetime.today()
     today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    response = requests.request("POST", cls_url, headers=cls_headers, data=payload)
-    res = response.json()
-    data = res["data"]["telegram"]["data"]
-    df = pd.DataFrame(data)
-    df = df[["descr", "id", "time"]]
-    df["descr"] = df["descr"].astype(str).str.replace("</em>", "")
-    df["descr"] = df["descr"].str.replace("<em>", "")
-    df["time"] = df["time"].apply(datetime.fromtimestamp)
-    df = df[df["time"] > today_start]
-    df.columns = ["快讯信息", "id", "时间"]
+    js = response.json()
+    roll_data = js["data"]["roll_data"]
+    df = pd.DataFrame(roll_data)
+    df = df[["ctime","title","brief"]]
+    df["ctime"] = df["ctime"].apply(datetime.fromtimestamp)
+    df = df[df["ctime"] > today_start]
+    df.columns = ["时间","标题","简讯"]
     return df
 
 
 if __name__ == "__main__":
-    print(stock_zh_a_alerts_cls())
+    print(stock_zh_a_roll_cls())
