@@ -71,5 +71,5 @@ def stock_zh_a_zt_analyse_cls(date: Optional[str] = None, img_path: str = "./img
         return True
 
 # if __name__ == "__main__":
-#     stock_zh_a_zt_analyse_cls = stock_zh_a_zt_analyse_cls(date="20210512")
-#     print(stock_zh_a_zt_analyse_cls)
+    # stock_zh_a_zt_analyse_cls = stock_zh_a_zt_analyse_cls(date="20230216")
+    # print(stock_zh_a_zt_analyse_cls)
