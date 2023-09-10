@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime,timedelta
 
 import pandas as pd
 import requests
@@ -27,13 +27,13 @@ cls_headers = {
     "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
-def stock_zh_a_roll_cls() -> pd.DataFrame:
+def stock_zh_a_roll_cls(td=2) -> pd.DataFrame:
     """
     财联社电报加红
     https://www.cls.cn/telegraph/
     :return: 时间,标题,简讯
     :rtype: pandas.DataFrame
-    只抓取当天200条内的
+    只抓取当天的，td是时区相关问题设置
     """
 
     url = "https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&refresh_type=1&rn=100&sv=7.7.5"
@@ -56,6 +56,9 @@ def stock_zh_a_roll_cls() -> pd.DataFrame:
 
     today = datetime.today()
     today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    # 修复时区
+    tdelta = timedelta(hours=td)
+    today_start = today_start - tdelta
     js = response.json()
     roll_data = js["data"]["roll_data"]
     df = pd.DataFrame(roll_data)
