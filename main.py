@@ -159,10 +159,10 @@ def merge_data(*args, **kwargs):
     )
     # 防止最新的重复
     df = df.loc[df["日期"] != date,:]
-    df = df.append(today_df)
-    df["日期"] = pd.to_datetime(df["日期"])
-    df = df.sort_values("日期")
-    df.to_csv("sentiment/stock2023.csv", index=False)
+    final_df = pd.concat([df,today_df])
+    final_df["日期"] = pd.to_datetime(final_df["日期"])
+    final_df = final_df.sort_values("日期")
+    final_df.to_csv("sentiment/stock2023.csv", index=False)
 
 
 def main(*args, **kwargs):
